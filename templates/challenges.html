@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Challenges — FitGuard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Challenges</h1>
+    <p class="page-sub">Set goals. Show up. Win.</p>
+  </div>
+</div>
+
+<div class="section-row">
+  <!-- New Challenge Form -->
+  <div class="card new-challenge-card">
+    <h2 class="card-title">Start a New Challenge</h2>
+    <form method="POST" action="{{ url_for('challenges') }}" class="challenge-form">
+      <div class="field-group">
+        <label for="title">Challenge Name</label>
+        <input type="text" id="title" name="title" placeholder="e.g. 30-Day Running Streak" required />
+      </div>
+      <div class="field-group">
+        <label for="target_days">Target Days</label>
+        <select id="target_days" name="target_days" required>
+          <option value="7">7 days — 1 week</option>
+          <option value="14">14 days — 2 weeks</option>
+          <option value="21">21 days — habit builder</option>
+          <option value="30" selected>30 days — classic</option>
+          <option value="60">60 days — serious</option>
+          <option value="100">100 days — legend</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-primary">Launch Challenge 🚀</button>
+    </form>
+  </div>
+
+  <!-- Challenge List -->
+  <div class="challenges-list">
+    {% if challenges %}
+      {% for ch in challenges %}
+        <div class="challenge-card {{ 'completed' if ch.status == 'completed' else '' }}">
+          <div class="challenge-top">
+            <div>
+              <h3 class="challenge-title">{{ ch.title }}</h3>
+              <p class="challenge-meta">Started {{ ch.start_date }} · {{ ch.target_days }} days</p>
+            </div>
+            {% if ch.status == 'completed' %}
+              <span class="badge-completed">🏆 Done!</span>
+            {% else %}
+              <form method="POST" action="{{ url_for('complete_day', cid=ch.id) }}">
+                <button type="submit" class="btn-check">✓ Day Done</button>
+              </form>
+            {% endif %}
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-bar">
+              <div class="progress-fill {{ 'full' if ch.status == 'completed' else '' }}"
+                   style="width: {{ [(ch.current_day / ch.target_days * 100)|int, 100]|min }}%">
+              </div>
+            </div>
+            <span class="progress-label">{{ ch.current_day }}/{{ ch.target_days }} days</span>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="card empty-state">
+        <div class="empty-icon">🎯</div>
+        <h2>No challenges yet</h2>
+        <p>Start one to kick-start your consistency.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Workout History — FitGuard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Workout History</h1>
+    <p class="page-sub">{{ workouts|length }} workout{{ 's' if workouts|length != 1 }} logged.</p>
+  </div>
+  <a href="{{ url_for('log_workout') }}" class="btn-primary">+ Log Workout</a>
+</div>
+
+{% if workouts %}
+  <div class="card">
+    <div class="workout-table">
+      <div class="table-head">
+        <span>Type</span><span>Date</span><span>Duration</span><span>Calories</span><span>Difficulty</span><span>Notes</span><span></span>
+      </div>
+      {% for w in workouts %}
+        <div class="table-row">
+          <span class="workout-type-badge">{{ w.workout_type }}</span>
+          <span>{{ w.workout_date }}</span>
+          <span>{{ w.duration }} min</span>
+          <span>{{ w.calories or '—' }}{% if w.calories %} kcal{% endif %}</span>
+          <span class="diff-badge diff-{{ w.difficulty|lower if w.difficulty else 'none' }}">{{ w.difficulty or '—' }}</span>
+          <span class="notes-cell" title="{{ w.notes or '' }}">{{ (w.notes or '')[:40] }}{% if w.notes and w.notes|length > 40 %}…{% endif %}</span>
+          <span>
+            <form method="POST" action="{{ url_for('delete_workout', workout_id=w.id) }}"
+                  onsubmit="return confirm('Delete this workout?')">
+              <button type="submit" class="btn-delete">✕</button>
+            </form>
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% else %}
+  <div class="card empty-state">
+    <div class="empty-icon">🏋️</div>
+    <h2>No workouts yet</h2>
+    <p>Start logging your sessions to see them here.</p>
+    <a href="{{ url_for('log_workout') }}" class="btn-primary">Log First Workout</a>
+  </div>
+{% endif %}
+{% endblock %}

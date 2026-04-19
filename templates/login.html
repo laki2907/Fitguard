@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Login — FitGuard{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-visual">
+    <div class="auth-visual-inner">
+      <div class="hero-icon">⚡</div>
+      <h1 class="hero-title">FitGuard</h1>
+      <p class="hero-sub">Track. Challenge.<br>Conquer.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><span>🔥</span> Streak tracking</div>
+        <div class="hero-stat"><span>🏆</span> Fitness challenges</div>
+        <div class="hero-stat"><span>📊</span> Progress analytics</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-form-panel">
+    <div class="auth-form-wrap">
+      <h2 class="form-title">Welcome back</h2>
+      <p class="form-sub">Log in to your account</p>
+
+      <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+        <div class="field-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="your_username" required autocomplete="username" />
+        </div>
+        <div class="field-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn-primary">Log In →</button>
+      </form>
+
+      <p class="auth-switch">Don't have an account? <a href="{{ url_for('register') }}">Sign up free</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
