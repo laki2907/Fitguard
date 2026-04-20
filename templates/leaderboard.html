@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Leaderboard — FitGuard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Leaderboard</h1>
+    <p class="page-sub">Ranked by FitPoints — suspicious workouts earn zero points.</p>
+  </div>
+  <a href="{{ url_for('log_workout') }}" class="btn-primary">+ Log Workout</a>
+</div>
+
+<!-- Scoring legend -->
+<div class="card" style="margin-bottom: 20px; padding: 16px 20px;">
+  <div style="display:flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+    <span style="font-size:13px; color: var(--muted); font-weight:600; letter-spacing:.4px; text-transform:uppercase;">How points work</span>
+    <span style="font-size:13px; color: var(--text);">⏱ <strong>1 pt</strong> per minute</span>
+    <span style="font-size:13px; color: var(--text);">🔋 <strong>0.5 pt</strong> per 10 kcal</span>
+    <span style="font-size:13px; color: var(--text);">🏆 <strong>10 pts</strong> per completed challenge</span>
+    <span style="font-size:13px; color: var(--orange);">⚠️ Flagged workouts = 0 pts</span>
+  </div>
+</div>
+
+{% if board %}
+  <div class="card">
+    <div class="leaderboard-table">
+      <!-- Header -->
+      <div class="lb-head">
+        <span>#</span>
+        <span>Athlete</span>
+        <span>FitPoints</span>
+        <span>Clean Workouts</span>
+        <span>Minutes</span>
+        <span>Challenges</span>
+        <span>Flags</span>
+      </div>
+
+      <!-- Rows -->
+      {% for entry in board %}
+        <div class="lb-row {{ 'me' if entry.is_me else '' }}">
+
+          <!-- Rank -->
+          <span>
+            <div class="rank-badge rank-{{ entry.rank if entry.rank <= 3 else 'other' }}">
+              {% if entry.rank == 1 %}🥇
+              {% elif entry.rank == 2 %}🥈
+              {% elif entry.rank == 3 %}🥉
+              {% else %}{{ entry.rank }}{% endif %}
+            </div>
+          </span>
+
+          <!-- Username -->
+          <span class="lb-username">
+            {{ entry.username }}
+            {% if entry.is_me %}<span style="font-size:11px; color:var(--muted); font-weight:400;"> (you)</span>{% endif %}
+          </span>
+
+          <!-- FitPoints -->
+          <span class="lb-points">{{ entry.total_points }}</span>
+
+          <!-- Clean workout count -->
+          <span style="color: var(--text);">{{ entry.clean_workouts }}</span>
+
+          <!-- Total clean minutes -->
+          <span style="color: var(--muted);">{{ entry.clean_minutes }} min</span>
+
+          <!-- Completed challenges -->
+          <span style="color: var(--muted);">{{ entry.challenges_done }}</span>
+
+          <!-- Flagged count -->
+          <span>
+            <span class="flag-pill {{ 'has-flags' if entry.flagged > 0 else 'no-flags' }}">
+              {{ '⚠️ ' ~ entry.flagged if entry.flagged > 0 else '✅ Clean' }}
+            </span>
+          </span>
+
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% else %}
+  <div class="card empty-state">
+    <div class="empty-icon">🏆</div>
+    <h2>No athletes yet</h2>
+    <p>Be the first to log a workout and claim the top spot!</p>
+    <a href="{{ url_for('log_workout') }}" class="btn-primary">Log Workout</a>
+  </div>
+{% endif %}
+{% endblock %}

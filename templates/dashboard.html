@@ -2,31 +2,39 @@
 {% block title %}Dashboard — FitGuard{% endblock %}
 
 {% block content %}
+
 <div class="page-header">
   <div>
     <h1 class="page-title">Dashboard</h1>
-    <p class="page-sub">Hey, <strong>{{ session.username }}</strong> — keep the momentum going!</p>
+    <p class="page-sub">
+      Hey, <strong>{{ session.username }}</strong> — keep the momentum going!
+    </p>
   </div>
   <a href="{{ url_for('log_workout') }}" class="btn-primary">+ Log Workout</a>
+  <a href="{{ url_for('leaderboard') }}" class="btn-primary">
+View Leaderboard 🏆
+</a>
 </div>
 
-<!-- Stats Row -->
 <div class="stats-grid">
   <div class="stat-card accent-orange">
     <div class="stat-icon">🔥</div>
     <div class="stat-value">{{ streak }}</div>
     <div class="stat-label">Day Streak</div>
   </div>
+
   <div class="stat-card accent-green">
     <div class="stat-icon">🏋️</div>
     <div class="stat-value">{{ stats.total_workouts }}</div>
     <div class="stat-label">Total Workouts</div>
   </div>
+
   <div class="stat-card accent-blue">
     <div class="stat-icon">⏱️</div>
     <div class="stat-value">{{ stats.total_minutes }}</div>
     <div class="stat-label">Total Minutes</div>
   </div>
+
   <div class="stat-card accent-purple">
     <div class="stat-icon">🔋</div>
     <div class="stat-value">{{ stats.total_calories }}</div>
@@ -34,76 +42,167 @@
   </div>
 </div>
 
-<!-- Weekly Chart -->
+
 <div class="section-row">
+
   <div class="card chart-card">
     <h2 class="card-title">Weekly Activity</h2>
+
     <div class="bar-chart" id="weekChart">
-      {% set days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
-      {% set weekly_map = {} %}
-      {% for w in weekly %}
-        {% set _ = weekly_map.update({w.workout_date: w.minutes}) %}
-      {% endfor %}
 
       {% for w in weekly %}
-        {% set pct = [((w.minutes / 120) * 100)|int, 100]|min %}
+        {% set pct = ((w.minutes or 0) / 120 * 100)|int %}
+
         <div class="bar-col">
           <div class="bar-wrap">
-            <div class="bar" style="height: {{ pct }}%" data-val="{{ w.minutes }}min"></div>
+            <div class="bar"
+                 style="height: {{ pct }}%;"
+                 data-val="{{ w.minutes }} min">
+            </div>
           </div>
-          <div class="bar-label">{{ w.workout_date[-5:] }}</div>
+
+          <div class="bar-label">
+            {{ w.workout_date[-5:] }}
+          </div>
         </div>
+
       {% else %}
-        <p class="empty-msg">No workouts logged this week yet.</p>
+
+        <p class="empty-msg">
+          No workouts logged this week yet.
+        </p>
+
       {% endfor %}
+
     </div>
   </div>
 
-  <!-- Active Challenges -->
+
   <div class="card challenges-mini">
     <h2 class="card-title">Active Challenges</h2>
+
     {% if challenges %}
+
       {% for ch in challenges %}
-        <div class="challenge-mini-item">
-          <div class="challenge-mini-title">{{ ch.title }}</div>
-          <div class="progress-wrap">
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: {{ [(ch.current_day / ch.target_days * 100)|int, 100]|min }}%"></div>
-            </div>
-            <span class="progress-label">{{ ch.current_day }}/{{ ch.target_days }}</span>
-          </div>
+
+      <div class="challenge-mini-item">
+        <div class="challenge-mini-title">
+          {{ ch.title }}
         </div>
+
+        <div class="progress-wrap">
+
+          <div class="progress-bar">
+
+            {% set progress = (ch.current_day / ch.target_days * 100)|int if ch.target_days else 0 %}
+
+            <div class="progress-fill"
+                 style="width: {{ progress }}%;">
+            </div>
+
+          </div>
+
+          <span class="progress-label">
+            {{ ch.current_day }}/{{ ch.target_days }}
+          </span>
+
+        </div>
+      </div>
+
       {% endfor %}
-      <a href="{{ url_for('challenges') }}" class="btn-ghost">View all →</a>
+
+      <a href="{{ url_for('challenges') }}" class="btn-ghost">
+        View all →
+      </a>
+
     {% else %}
-      <p class="empty-msg">No active challenges.<br><a href="{{ url_for('challenges') }}">Start one!</a></p>
+
+      <p class="empty-msg">
+        No active challenges.
+        <br>
+        <a href="{{ url_for('challenges') }}">
+          Start one!
+        </a>
+      </p>
+
     {% endif %}
+
   </div>
+
 </div>
 
-<!-- Recent Workouts -->
+
 <div class="card">
+
   <div class="card-header-row">
     <h2 class="card-title">Recent Workouts</h2>
-    <a href="{{ url_for('workouts') }}" class="btn-ghost">View all →</a>
+    <a href="{{ url_for('workouts') }}" class="btn-ghost">
+      View all →
+    </a>
   </div>
+
   {% if workouts %}
-    <div class="workout-table">
-      <div class="table-head">
-        <span>Type</span><span>Date</span><span>Duration</span><span>Calories</span><span>Difficulty</span>
-      </div>
-      {% for w in workouts %}
-        <div class="table-row">
-          <span class="workout-type-badge">{{ w.workout_type }}</span>
-          <span>{{ w.workout_date }}</span>
-          <span>{{ w.duration }} min</span>
-          <span>{{ w.calories or '—' }}{% if w.calories %} kcal{% endif %}</span>
-          <span class="diff-badge diff-{{ w.difficulty|lower if w.difficulty else 'none' }}">{{ w.difficulty or '—' }}</span>
-        </div>
-      {% endfor %}
+
+  <div class="workout-table">
+
+    <div class="table-head">
+      <span>Type</span>
+      <span>Date</span>
+      <span>Duration</span>
+      <span>Calories</span>
+      <span>Difficulty</span>
+      <span>AI Status</span>
     </div>
+
+    {% for w in workouts %}
+
+    <div class="table-row">
+
+      <span class="workout-type-badge">
+        {{ w.workout_type }}
+      </span>
+
+      <span>
+        {{ w.workout_date }}
+      </span>
+
+      <span>
+        {{ w.duration }} min
+      </span>
+
+      <span>
+        {{ w.calories or '—' }}
+        {% if w.calories %} kcal{% endif %}
+      </span>
+
+      <span class="diff-badge diff-{{ w.difficulty|lower if w.difficulty else 'none' }}">
+        {{ w.difficulty or '—' }}
+      </span>
+
+      <span class="anomaly-badge anomaly-{{ w.anomaly_status or 'normal' }}"
+            title="{{ w.anomaly_reason or 'Looks normal' }}">
+
+        {{ '⚠️ Suspicious' if w.anomaly_status == 'suspicious' else '✅ Normal' }}
+
+      </span>
+
+    </div>
+
+    {% endfor %}
+
+  </div>
+
   {% else %}
-    <p class="empty-msg">No workouts yet. <a href="{{ url_for('log_workout') }}">Log your first one!</a></p>
+
+  <p class="empty-msg">
+    No workouts yet.
+    <a href="{{ url_for('log_workout') }}">
+      Log your first one!
+    </a>
+  </p>
+
   {% endif %}
+
 </div>
+
 {% endblock %}

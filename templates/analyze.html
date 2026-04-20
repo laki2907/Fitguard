@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}AI Anomaly Check — FitGuard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">AI Anomaly Check</h1>
+    <p class="page-sub">Enter a workout's stats to check if the pattern looks suspicious.</p>
+  </div>
+  <a href="{{ url_for('dashboard') }}" class="btn-ghost">← Back</a>
+</div>
+
+<div class="form-container">
+  <div class="card">
+    <!-- ── How it works ─────────────────────────────────────────────── -->
+    <div class="analyze-explainer">
+      <h3>🤖 How it works</h3>
+      <p>
+        This tool uses an <strong>Isolation Forest</strong> — an unsupervised machine
+        learning model trained on synthetic normal workout data. It flags entries whose
+        <em>duration / calorie combination</em> falls far outside realistic human ranges.
+      </p>
+      <div class="explainer-tags">
+        <span class="tag">Normal duration: 10–120 min</span>
+        <span class="tag">Normal calories: 50–800 kcal</span>
+        <span class="tag">Max rate: ~30 kcal/min</span>
+      </div>
+    </div>
+
+    <!-- ── Input form ────────────────────────────────────────────────── -->
+    <form method="POST" action="{{ url_for('analyze') }}" class="workout-form" style="margin-top: 24px;">
+      <div class="form-grid">
+        <div class="field-group">
+          <label for="duration">Duration (minutes) <span class="req">*</span></label>
+          <input type="number" id="duration" name="duration" min="1" max="1440"
+                 placeholder="e.g. 45"
+                 value="{{ duration if duration is not none else '' }}" required />
+        </div>
+        <div class="field-group">
+          <label for="calories">Calories Burned <span class="req">*</span></label>
+          <input type="number" id="calories" name="calories" min="0" max="9999"
+                 placeholder="e.g. 350"
+                 value="{{ calories if calories is not none else '' }}" required />
+        </div>
+      </div>
+      <div class="form-actions" style="margin-top: 8px;">
+        <button type="submit" class="btn-primary">Analyze Workout 🔍</button>
+      </div>
+    </form>
+
+    <!-- ── Result banner ─────────────────────────────────────────────── -->
+    {% if result %}
+      <div class="analyze-result {{ 'result-normal' if result == 'Normal Activity' else 'result-suspicious' }}">
+        <div class="result-icon">
+          {{ '✅' if result == 'Normal Activity' else ('⚠️' if result != 'Error' else '❌') }}
+        </div>
+        <div>
+          <div class="result-verdict">{{ result }}</div>
+          <div class="result-reason">{{ reason }}</div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Side info card ──────────────────────────────────────────────── -->
+  <div class="tips-card">
+    <h3>🚩 Flagged patterns</h3>
+    <ul>
+      <li>Duration over 600 min (10 hrs)</li>
+      <li>Calorie rate above 30 kcal/min</li>
+      <li>Outlier combos vs. training data</li>
+      <li>Statistically unusual distributions</li>
+    </ul>
+    <div style="margin-top: 20px;">
+      <h3>✅ Normal examples</h3>
+      <ul>
+        <li>30 min run → ~280 kcal</li>
+        <li>60 min cycling → ~450 kcal</li>
+        <li>45 min HIIT → ~400 kcal</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Inline styles for the result banner (no CSS file changes needed) -->
+<style>
+.analyze-explainer {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+.analyze-explainer h3 { font-family: var(--font-head); font-size: 15px; margin-bottom: 8px; }
+.analyze-explainer p  { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.explainer-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tag {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.analyze-result {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  animation: fadeUp 0.3s ease both;
+}
+.result-normal     { background: rgba(61,220,132,0.08); border-color: var(--green); }
+.result-suspicious { background: rgba(255,107,53,0.08); border-color: var(--orange); }
+
+.result-icon   { font-size: 32px; line-height: 1; }
+.result-verdict {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.result-reason { font-size: 14px; color: var(--muted); line-height: 1.5; }
+</style>
+{% endblock %}
