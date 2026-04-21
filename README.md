@@ -1,24 +1,66 @@
-# ⚡ FitGuard — AI-Powered Fitness Challenge Tracker
+# ⚡ FitGuard — Gamified Fitness Tracker with Anomaly Detection & Smart Assistant
 
-A full-stack Flask web application for tracking workouts, streaks, and fitness challenges.
+FitGuard is a full-stack Flask-based fitness platform that combines workout tracking, challenge gamification, anomaly detection, and an intelligent assistant for personalized recommendations.
 
 ## Features
-- 🔐 User authentication (register / login / logout)
-- 📊 Dashboard with stats, streak counter, and weekly bar chart
-- 🏋️ Workout logging form with type, duration, calories, difficulty & notes
-- 📜 Full workout history with delete support
-- 🎯 Challenge tracker with day-by-day progress
-- 💾 SQLite database (zero-config)
+
+### Core Fitness Tracking
+- 🔐 User authentication (Register / Login / Logout)
+- 🏋️ Log workouts (type, duration, calories, difficulty, notes)
+- 📊 Dashboard with:
+  - Streak tracking
+  - Total workouts
+  - Total minutes
+  - Calories burned
+  - Weekly activity graph
+
+### Gamification
+- 🎯 Create and manage fitness challenges
+- ✅ One challenge completion allowed per day (challenge integrity protection)
+- 🏆 Leaderboard using FitPoints scoring
+
+### Anomaly Detection
+- 🤖 Isolation Forest based anomaly detection
+- Flags suspicious workout activity:
+  - unrealistic duration
+  - impossible calorie burn
+  - duplicate workout logs
+  - statistical outliers
+
+### Smart Assistant
+- 💬 FitGuard Assistant / Smart Coach
+- Context-aware support for:
+  - Workout recommendations
+  - Recovery advice
+  - Progress summaries
+  - Challenge status
+  - Anomaly explanations
+  - Motivation prompts
+
+## Tech Stack
+
+- Python
+- Flask
+- SQLite
+- Scikit-learn
+- NumPy
+- HTML/CSS
+- JavaScript
+- Jinja2
 
 ## Project Structure
-```
+
+```text
 fitguard/
-├── app.py                  # Flask app, routes, DB logic
-├── fitguard.db             # SQLite DB (auto-created)
+├── app.py
+├── fitguard.db
 ├── requirements.txt
+├── utils.py
 ├── static/
 │   ├── css/style.css
-│   └── js/app.js
+│   └── js/
+│       ├── app.js
+│       └── assistant.js
 └── templates/
     ├── base.html
     ├── login.html
@@ -26,27 +68,46 @@ fitguard/
     ├── dashboard.html
     ├── log_workout.html
     ├── workouts.html
-    └── challenges.html
+    ├── challenges.html
+    ├── leaderboard.html
+    ├── analyze.html
 ```
 
-## Setup & Run
+## Setup
 
 ```bash
-# 1. Create a virtual environment
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-
-# 2. Install dependencies
+source venv/bin/activate
 pip install -r requirements.txt
-
-# 3. Run the app
 python app.py
 ```
 
-Open http://127.0.0.1:5000 in your browser.
+For Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+Run locally:
+
+```bash
+http://127.0.0.1:5000
+```
 
 ## Usage
-1. Register a new account
-2. Log your first workout via **Log Workout**
-3. Start a fitness challenge under **Challenges**
-4. Watch your streak grow on the **Dashboard**
+
+1. Create account  
+2. Log workouts  
+3. Start challenges  
+4. Use anomaly detection  
+5. Track leaderboard progress  
+6. Use Smart Coach assistant for recommendations
+
+## Future Improvements
+- Adaptive challenge generation
+- Burnout detection
+- Expanded intelligent recommendations
+- Mobile-responsive deployment
+
+## Author
+Built as a mini-project using Flask and machine learning concepts.
