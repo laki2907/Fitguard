@@ -43,13 +43,23 @@
               <h3 class="challenge-title">{{ ch.title }}</h3>
               <p class="challenge-meta">Started {{ ch.start_date }} · {{ ch.target_days }} days</p>
             </div>
-            {% if ch.status == 'completed' %}
-              <span class="badge-completed">🏆 Done!</span>
-            {% else %}
-              <form method="POST" action="{{ url_for('complete_day', cid=ch.id) }}">
-                <button type="submit" class="btn-check">✓ Day Done</button>
+            <div style="display:flex; gap:8px; align-items:center;">
+              {% if ch.status == 'completed' %}
+                <span class="badge-completed">🏆 Done!</span>
+              {% elif ch.id in done_today %}
+                <span class="badge-done-today" title="Already checked in today — come back tomorrow!">
+                  ✅ Done today
+                </span>
+              {% else %}
+                <form method="POST" action="{{ url_for('complete_day', cid=ch.id) }}">
+                  <button type="submit" class="btn-check">✓ Day Done</button>
+                </form>
+              {% endif %}
+              <form method="POST" action="{{ url_for('delete_challenge', cid=ch.id) }}"
+                    onsubmit="return confirm('Remove this challenge?')">
+                <button type="submit" class="btn-delete" title="Remove challenge">✕</button>
               </form>
-            {% endif %}
+            </div>
           </div>
           <div class="progress-wrap">
             <div class="progress-bar">

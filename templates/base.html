@@ -19,25 +19,67 @@
       <a href="{{ url_for('log_workout') }}" class="nav-link {% if request.endpoint == 'log_workout' %}active{% endif %}">Log Workout</a>
       <a href="{{ url_for('workouts') }}" class="nav-link {% if request.endpoint == 'workouts' %}active{% endif %}">History</a>
       <a href="{{ url_for('challenges') }}" class="nav-link {% if request.endpoint == 'challenges' %}active{% endif %}">Challenges</a>
+      <a href="{{ url_for('leaderboard') }}" class="nav-link {% if request.endpoint == 'leaderboard' %}active{% endif %}">🏆 Leaderboard</a>
+      <a href="{{ url_for('analyze') }}" class="nav-link {% if request.endpoint == 'analyze' %}active{% endif %}">🤖 AI Check</a>
       <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
     </div>
   </nav>
   {% endif %}
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-container">
-        {% for cat, msg in messages %}
-          <div class="flash flash-{{ cat }}">{{ msg }}</div>
-        {% endfor %}
+  {% if session.user_id %}
+  <!-- ── FitGuard Assistant Sidebar ──────────────────────────────────────── -->
+  <div id="fg-sidebar" class="fg-sidebar" aria-label="FitGuard Assistant">
+    <div class="fg-sidebar-header">
+      <span class="fg-sidebar-title">⚡ FitGuard Assistant</span>
+      <button class="fg-close-btn" id="fg-close" aria-label="Close assistant">✕</button>
+    </div>
+    <div class="fg-messages" id="fg-messages">
+      <div class="fg-msg fg-msg-bot">
+        <div class="fg-bubble">
+          👋 Hey! Ask me about your <strong>workouts</strong>, <strong>recovery</strong>,
+          <strong>anomalies</strong>, or type <strong>recommend</strong> for your next session.
+        </div>
       </div>
-    {% endif %}
-  {% endwith %}
+    </div>
+    <div class="fg-quick-btns" id="fg-quick">
+      <button class="fg-quick" data-msg="recommend">💡 Recommend</button>
+      <button class="fg-quick" data-msg="recovery">😴 Recovery</button>
+      <button class="fg-quick" data-msg="progress">📊 Progress</button>
+      <button class="fg-quick" data-msg="anomaly">🚩 Anomaly</button>
+      <button class="fg-quick" data-msg="challenge">🎯 Challenge</button>
+      <button class="fg-quick" data-msg="streak">🔥 Streak</button>
+    </div>
+    <form class="fg-input-row" id="fg-form" autocomplete="off">
+      <input type="text" id="fg-input" class="fg-input"
+             placeholder="Ask anything…" maxlength="200" />
+      <button type="submit" class="fg-send-btn" aria-label="Send">↑</button>
+    </form>
+  </div>
+
+  <!-- Floating toggle button — always visible when logged in -->
+  <button class="fg-fab" id="fg-fab" aria-label="Open FitGuard Assistant">
+    <span class="fg-fab-icon">💬</span>
+    <span class="fg-fab-label">Assistant</span>
+  </button>
+  <!-- ────────────────────────────────────────────────────────────────────── -->
+  {% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
   <main class="main-content">
     {% block content %}{% endblock %}
   </main>
 
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% if session.user_id %}
+  <script src="{{ url_for('static', filename='js/assistant.js') }}"></script>
+  {% endif %}
 </body>
 </html>
